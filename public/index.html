@@ -1262,18 +1262,18 @@ function via(p){
 }
 
 // ══ TOAST ══
-function toast(msg){
+function toast(msg, duration=2600){
   const t = document.getElementById('toast');
   if (!t) return;
   t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2600);
+  setTimeout(() => t.classList.remove('show'), duration);
 }
 
 // ══ INIT ══
 checkApi();
 setInterval(checkApi, 30000);
 loadDaily();
-setTimeout(() => toast('أهلاً — اللهم صلِّ على نبينا محمد ﷺ'), 700);
+setTimeout(() => toast('أهلاً — اللهم صلِّ على نبينا محمد ﷺ'), 1000);
 </script>
 </body>
 </html>
