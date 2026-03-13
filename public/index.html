@@ -781,7 +781,7 @@ async function api(path){
 }
 function buildPath(q, page, opts){
   const { degree='', zone='*', books=[], rawis=[], mohdith=[] } = opts;
-  let p = `/v1/site/hadith/search?value=${encodeURIComponent(q)}&page=${page}&removehtml=true&specialist=false`;
+  let p = `/v1/site/hadith/search?value=${encodeURIComponent(q)}&page=${page}&removehtml=true&specialist=false&tab=1`;
   if (degree) p += `&d[]=${degree}`;
   books.forEach(b  => p += `&s[]=${b}`);
   mohdith.forEach(m => p += `&m[]=${m}`);
