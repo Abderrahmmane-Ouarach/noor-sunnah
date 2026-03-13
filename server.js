@@ -9,7 +9,7 @@ const fs   = require('fs');
 const path = require('path');
 
 const PORT        = process.env.PORT || 3000;
-const TARGET_HOST = '98.92.59.173';
+const TARGET_HOST = '98.92.30.29';
 const TARGET_PORT = 80;
 
 http.createServer((req, res) => {
