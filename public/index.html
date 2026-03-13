@@ -804,8 +804,8 @@ function buildPath(q, page, opts){
   if (degree) p += `&d[]=${degree}`;
   books.forEach(b  => p += `&s[]=${b}`);
   mohdith.forEach(m => p += `&m[]=${m}`);
-  rawis.forEach(r  => p += `&rawi[]=${encodeURIComponent(r)}`);
-  p += (zone && zone !== '*') ? `&t=${zone}` : `&t=0`;
+  rawis.forEach(r  => p += `&rawi[]=${encodeURIComponent(r.trim())}`);
+  if (zone && zone !== '*') p += `&t=${zone}`;
   return p;
 }
 
