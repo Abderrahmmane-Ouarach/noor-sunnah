@@ -1063,8 +1063,9 @@ function quickSearch(kw){
 
 // ══ SEARCH ══
 async function doSearch(){
-  const q = document.getElementById('q')?.value.trim();
-  if (!q) { toast('أدخل كلمة للبحث'); return; }
+  const raw = document.getElementById('q')?.value.trim();
+  if (!raw) { toast('أدخل كلمة للبحث'); return; }
+  const q = removeTashkeel(raw);  // ← AJOUTER
   S.query = q; S.page = 1;
   const sr = document.getElementById('search-results');
   if (sr) sr.innerHTML = '<div class="loading"><div class="spin"></div> جارٍ البحث في السنة النبوية...</div>';
@@ -1280,6 +1281,17 @@ function toast(msg, duration=2600){
   }, duration);
 }
 
+
+  function removeTashkeel(str) {
+  return str
+    .replace(/[\u0610-\u061A\u064B-\u065F\u0670]/g, '') // tashkeel
+    .replace(/\u0622/g, '\u0627')  // أ → ا
+    .replace(/\u0623/g, '\u0627')  // أ → ا
+    .replace(/\u0625/g, '\u0627')  // إ → ا
+    .replace(/\u0671/g, '\u0627')  // ٱ → ا
+    .replace(/\u0629/g, '\u0647')  // ة → ه
+    .trim();
+}
 // ══ INIT ══
 checkApi();
 setInterval(checkApi, 30000);
