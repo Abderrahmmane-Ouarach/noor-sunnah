@@ -563,6 +563,21 @@ main{max-width:1100px;margin:0 auto;padding:18px 14px 80px;position:relative;z-i
       </div>
     </div>
 
+
+    <div class="acard">
+  <div class="acard-header">
+    <div class="acard-icon gold-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+    </div>
+    <h3>تنبيه مهم</h3>
+  </div>
+  <p>هذا الموقع أداة بحثية مساعدة، وقد تقع أخطاء في عرض البيانات أو استرجاعها. لا يُعتمد عليه وحده في الأحكام الشرعية — يُرجى التحقق دائمًا من المصادر الأصلية مثل <a href="https://dorar.net" target="_blank" rel="noopener" style="color:var(--emerald);font-weight:600">الدرر السنية</a>.</p>
+</div>
+
     <div class="acard">
       <div class="acard-header">
         <div class="acard-icon">
@@ -897,7 +912,13 @@ function renderResults(arr, cid, total){
     const p = S.page, max = Math.min(S.totalPages, p+4), min = Math.max(1, p-2);
     if (min > 1) html += `<button class="pbtn" onclick="gotoPage(1)">1</button><span style="align-self:center;color:var(--ink-muted)">…</span>`;
     for (let i = min; i <= max; i++) html += `<button class="pbtn ${i===p?'on':''}" onclick="gotoPage(${i})">${i}</button>`;
+    
     if (max < S.totalPages) html += `<span style="align-self:center;color:var(--ink-muted)">…</span><button class="pbtn" onclick="gotoPage(${S.totalPages})">${S.totalPages}</button>`;
+    html += `
+  <div style="text-align:center;padding:14px 10px 4px;font-size:.69rem;color:var(--ink-muted);line-height:1.8;border-top:1px solid var(--border);margin-top:10px">
+    ⚠️ قد تحتوي النتائج على أخطاء في العرض — تحقق دائمًا من المصدر الأصلي
+    <a href="https://dorar.net" target="_blank" rel="noopener" style="color:var(--emerald);font-weight:600">الدرر السنية</a>
+  </div>`;
     html += `</div>`;
   }
   el.innerHTML = html;
@@ -956,7 +977,6 @@ async function loadDaily(){
   } catch(e){
     const dt = document.getElementById('daily-text');
     const dm = document.getElementById('daily-meta');
-    if (dt) dt.innerHTML = `<span style="color:rgba(255,255,255,.65);font-size:.88rem">تعذر تحميل الحديث — تأكد أن البروكسي يعمل: <strong>node proxy.js</strong></span>`;
     if (dm) dm.innerHTML = `<button class="btn btn-outline btn-sm" onclick="loadDaily()">إعادة المحاولة</button>`;
   }
 }
