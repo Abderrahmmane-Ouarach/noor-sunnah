@@ -43,13 +43,35 @@ http.createServer((req, res) => {
     return;
   }
 
-  // ── Static: serve public/index.html for everything else ────
-  const filePath = path.join(__dirname, 'public', 'index.html');
-  fs.readFile(filePath, (err, data) => {
-    if (err) { res.writeHead(404); res.end('Not found'); return; }
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    res.end(data);
-  });
+  // ── Static: serve public/ files ────────────────────────────
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.css':  'text/css',
+  '.js':   'application/javascript',
+  '.json': 'application/json',
+  '.png':  'image/png',
+  '.jpg':  'image/jpeg',
+  '.ico':  'image/x-icon',
+  '.svg':  'image/svg+xml',
+};
+
+let filePath = path.join(__dirname, 'public', req.url === '/' ? 'index.html' : req.url);
+
+fs.readFile(filePath, (err, data) => {
+  if (err) {
+    // fallback → index.html (SPA)
+    fs.readFile(path.join(__dirname, 'public', 'index.html'), (err2, data2) => {
+      if (err2) { res.writeHead(404); res.end('Not found'); return; }
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(data2);
+    });
+    return;
+  }
+  const ext  = path.extname(filePath);
+  const mime = MIME[ext] || 'application/octet-stream';
+  res.writeHead(200, { 'Content-Type': mime });
+  res.end(data);
+});
 
 }).listen(PORT, '0.0.0.0', () => {
   console.log(`✅  نور السنة on port ${PORT}`);
