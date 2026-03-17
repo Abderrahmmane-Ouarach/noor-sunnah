@@ -198,12 +198,14 @@ function renderActiveFilters(){
 function rmFilter(i){ const w = document.getElementById('active-filters'); if (w?._chips?.[i]) w._chips[i].rm(); }
 
 // ══ BADGE ══
-function badge(g){
+// درجة الحديث حكم المحدث — تُعرض دائماً منسوبةً إليه
+function badge(g, mohdith){
   if (!g) return '';
-  if (g.includes('صحيح')) return `<span class="badge b-sahih">${g}</span>`;
-  if (g.includes('حسن'))  return `<span class="badge b-hasan">${g}</span>`;
-  if (g.includes('ضعيف')||g.includes('موضوع')||g.includes('منكر')) return `<span class="badge b-daif">${g}</span>`;
-  return `<span class="badge" style="background:rgba(0,0,0,.06);color:var(--ink-muted);border:1px solid rgba(0,0,0,.1)">${g}</span>`;
+  const label = mohdith ? `${g} — ${mohdith}` : g;
+  if (g.includes('صحيح')) return `<span class="badge b-sahih" title="حكم ${mohdith||'المحدث'} على الحديث">${label}</span>`;
+  if (g.includes('حسن'))  return `<span class="badge b-hasan" title="حكم ${mohdith||'المحدث'} على الحديث">${label}</span>`;
+  if (g.includes('ضعيف')||g.includes('موضوع')||g.includes('منكر')) return `<span class="badge b-daif" title="حكم ${mohdith||'المحدث'} على الحديث">${label}</span>`;
+  return `<span class="badge" style="background:rgba(0,0,0,.06);color:var(--ink-muted);border:1px solid rgba(0,0,0,.1)" title="حكم ${mohdith||'المحدث'} على الحديث">${label}</span>`;
 }
 
 function isFav(h){ return S.favs.some(f => f.hadith === h.hadith && f.rawi === h.rawi); }
@@ -221,7 +223,7 @@ function card(h, i){
   const cats = (h.categories||[]).map(c => `<span class="cat">${c.name}</span>`).join('');
   return `<div class="hcard" id="c${i}">
     <div class="card-top">
-      <div class="card-badges">${badge(h.grade)}${h.book?`<span class="badge b-book">${h.book}</span>`:''}</div>
+      <div class="card-badges">${badge(h.grade, h.mohdith)}${h.book?`<span class="badge b-book">${h.book}</span>`:''}</div>
       <div class="card-btns">
         <button class="ico-btn ${fav?'fav':''}" onclick="toggleFav(${i})" title="${fav?'إزالة':'حفظ'}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="${fav?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
@@ -236,7 +238,6 @@ function card(h, i){
     <div class="card-foot">
       <div class="card-meta">
         ${h.rawi?`<span class="badge b-rawi">${h.rawi}</span>`:''}
-        ${h.mohdith?`<span class="badge b-mohdith">${h.mohdith}</span>`:''}
       </div>
       <div class="card-acts">
         ${h.hasSimilarHadith?`<button class="btn btn-sm btn-green" onclick="openSimilar(${i})">مشابهة</button>`:''}
@@ -343,9 +344,8 @@ function renderDaily(){
   const dm = document.getElementById('daily-meta');
   if (dt) dt.textContent = h.hadith || '';
   if (dm) dm.innerHTML = `
-    ${badge(h.grade)}
+    ${badge(h.grade, h.mohdith)}
     ${h.rawi   ? `<span class="badge b-rawi"  style="color:rgba(255,255,255,.75);background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)">${h.rawi}</span>` : ''}
-    ${h.mohdith? `<span class="badge b-book">${h.mohdith}</span>` : ''}
     ${h.book   ? `<span class="badge b-book">${h.book}</span>` : ''}
   `;
   const shPanel = document.getElementById('daily-sharh');
@@ -503,7 +503,7 @@ async function openDetail(i, scrollToSharh){
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-hadith">${h.hadith||''}</div>
     <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px">
-      ${badge(h.grade)}
+      ${badge(h.grade, h.mohdith)}
       ${h.rawi         ? `<span class="badge b-rawi">${h.rawi}</span>` : ''}
       ${h.book         ? `<span class="badge b-book">${h.book}</span>` : ''}
       ${h.numberOrPage ? `<span class="badge" style="background:var(--bg2);color:var(--ink-muted);border:1px solid var(--border)">رقم: ${h.numberOrPage}</span>` : ''}
@@ -555,7 +555,7 @@ async function openSimilar(i){
     document.getElementById('modal-body').innerHTML =
       `<div class="modal-hadith" style="margin-bottom:14px">${h.hadith||''}</div>
       <div class="sec-title">مشابهة (${s.length})</div>` +
-      s.slice(0,8).map(x => `<div class="similar-item"><div class="similar-text">${x.hadith||''}</div><div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">${badge(x.grade)}${x.rawi?`<span class="badge b-rawi">${x.rawi}</span>`:''}</div></div>`).join('');
+      s.slice(0,8).map(x => `<div class="similar-item"><div class="similar-text">${x.hadith||''}</div><div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">${badge(x.grade, x.mohdith)}${x.rawi?`<span class="badge b-rawi">${x.rawi}</span>`:''}</div></div>`).join('');
   } catch(e){
     document.getElementById('modal-body').innerHTML = '<div style="text-align:center;padding:18px;color:var(--ink-muted)">تعذر التحميل</div>';
   }
