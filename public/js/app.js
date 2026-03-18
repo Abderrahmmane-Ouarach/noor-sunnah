@@ -547,19 +547,9 @@ async function loadSimilar(id){
     const d = await api(`/v1/site/hadith/similar/${id}`);
     document.getElementById('sl')?.remove();
     const s = d.data || [];
-    window._similarR = s;
     mb.insertAdjacentHTML('beforeend',
       `<div class="sec-title">مشابهة (${s.length})</div>` +
-      s.slice(0,8).map((x, idx) => `
-        <div class="similar-item" onclick="openSimilarDetail(${idx})" style="cursor:pointer">
-          <div class="similar-text">${x.hadith||''}</div>
-          <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;align-items:center">
-            ${badge(x.grade, x.mohdith)}
-            ${x.rawi ? `<span class="badge b-rawi" style="cursor:pointer" onclick="event.stopPropagation();document.getElementById('detail-overlay').classList.remove('open');quickSearch('${(x.rawi||'').replace(/'/g,"\\'")}')">${x.rawi}</span>` : ''}
-            ${x.book ? `<span class="badge b-book">${x.book}</span>` : ''}
-            <span style="margin-right:auto;font-size:.7rem;color:var(--emerald);font-weight:600">← تفاصيل</span>
-          </div>
-        </div>`).join(''));
+      s.slice(0,6).map(x => `<div class="similar-item"><div class="similar-text">${x.hadith.substring(0,200)}…</div><div style="margin-top:5px">${badge(x.grade)}</div></div>`).join(''));
   } catch(e){ document.getElementById('sl')?.remove(); }
 }
 
