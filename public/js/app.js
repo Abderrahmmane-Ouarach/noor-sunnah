@@ -477,6 +477,7 @@ async function gotoPage(p){
 async function openDetail(i, scrollToSharh){
   const R = getResultSet();
   const h = R[i]; if (!h) return;
+  console.log('hadith obj:', h);
   document.getElementById('detail-overlay').classList.add('open');
   document.getElementById('modal-body').innerHTML = '<div class="loading"><div class="spin"></div> تحميل التفاصيل...</div>';
   let shH = '', mhH = '', tkH = '';
@@ -485,7 +486,7 @@ async function openDetail(i, scrollToSharh){
   if (!sharhRaw && (h.sharhMetadata?.id || h.hadithId)){
     const fetchId = h.sharhMetadata?.id || h.hadithId;
     try {
-      const sd = await api(`/v1/site/sharh/${fetchId}`);
+      const d = await api(`/v1/site/hadith/similar/${h.hadithId||h.id}`);
       sharhRaw = sd?.data?.sharhMetadata?.sharh || sd?.data?.sharh || sd?.sharhMetadata?.sharh || '';
     } catch(e){}
   }
@@ -522,7 +523,7 @@ async function openDetail(i, scrollToSharh){
     <div style="display:flex;gap:7px;flex-wrap:wrap">
       <button class="btn btn-gold btn-sm" onclick="triggerShareByParts('${hE}','${rE}','${mE}','${gE}')">مشاركة</button>
       <button class="btn btn-sm btn-light" onclick="saveFavObj(${i})">حفظ</button>
-      ${h.hasSimilarHadith?`<button class="btn btn-sm btn-green" onclick="loadSimilar('${h.hadithId}')">مشابهة</button>`:''}
+      ${h.hasSimilarHadith?`<button class="btn btn-sm btn-green" onclick="loadSimilar('${h.hadithId||h.id||''}')">مشابهة</button>`:''}
     </div>`;
   if (scrollToSharh){
     setTimeout(() => {
