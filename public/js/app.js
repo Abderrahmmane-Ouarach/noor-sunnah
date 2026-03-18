@@ -522,7 +522,7 @@ async function openDetail(i, scrollToSharh){
     <div style="display:flex;gap:7px;flex-wrap:wrap">
       <button class="btn btn-gold btn-sm" onclick="triggerShareByParts('${hE}','${rE}','${mE}','${gE}')">مشاركة</button>
       <button class="btn btn-sm btn-light" onclick="saveFavObj(${i})">حفظ</button>
-      ${h.hasSimilarHadith?`<button class="btn btn-sm btn-green" onclick="loadSimilar('${h.hadithId}')">مشابهة</button>`:''}
+      ${h.hasSimilarHadith?`<button class="btn btn-sm btn-green" id="sim-btn-detail" onclick="openSimilarFromDetail(${i})">مشابهة</button>`:''}
     </div>`;
   if (scrollToSharh){
     setTimeout(() => {
@@ -531,6 +531,48 @@ async function openDetail(i, scrollToSharh){
     }, 120);
   }
 }
+
+
+
+
+async function openSimilarFromDetail(i){
+  const R = getResultSet();
+  const h = R[i]; if (!h) return;
+  
+  // cherche l'id dans tous les champs possibles
+  const id = h.hadithId || h.id || h._id || h.hadith_id;
+  if (!id) { toast('لا يوجد معرّف للحديث'); console.log('hadith obj:', h); return; }
+
+  const mb = document.getElementById('modal-body');
+  // remplace tout le contenu du modal par les résultats mشابهة
+  mb.innerHTML = `
+    <div class="modal-hadith" style="font-size:.85rem;opacity:.65;margin-bottom:14px">${(h.hadith||'').substring(0,150)}…</div>
+    <div class="loading"><div class="spin"></div> جارٍ تحميل الأحاديث المشابهة...</div>`;
+  try {
+    const d = await api(`/v1/site/hadith/similar/${id}`);
+    const s = d.data || [];
+    if (!s.length){ mb.innerHTML += '<div style="text-align:center;padding:18px;color:var(--ink-muted)">لا توجد أحاديث مشابهة</div>'; return; }
+    window._similarR = s;
+    mb.innerHTML = `
+      <div class="modal-hadith" style="font-size:.85rem;opacity:.65;margin-bottom:14px">${(h.hadith||'').substring(0,150)}…</div>
+      <div class="sec-title">مشابهة (${s.length})</div>` +
+      s.slice(0,8).map((x, idx) => `
+        <div class="similar-item" onclick="openSimilarDetail(${idx})" style="cursor:pointer">
+          <div class="similar-text">${x.hadith||''}</div>
+          <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+            ${badge(x.grade, x.mohdith)}
+            ${x.rawi ? `<span class="badge b-rawi" style="cursor:pointer" onclick="event.stopPropagation();document.getElementById('detail-overlay').classList.remove('open');quickSearch('${(x.rawi||'').replace(/'/g,"\\'")}')">${x.rawi}</span>` : ''}
+            ${x.book ? `<span class="badge b-book">${x.book}</span>` : ''}
+            <span style="margin-right:auto;font-size:.7rem;color:var(--emerald);font-weight:600">← تفاصيل</span>
+          </div>
+        </div>`).join('');
+  } catch(e){
+    mb.innerHTML = '<div style="text-align:center;padding:18px;color:var(--ink-muted)">تعذر التحميل</div>';
+  }
+}
+
+
+
 
 function saveFavObj(i){
   const R = getResultSet();
