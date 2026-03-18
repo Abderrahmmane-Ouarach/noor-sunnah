@@ -548,17 +548,38 @@ async function openSimilar(i){
   const R = getResultSet();
   const h = R[i]; if (!h || !h.hadithId) return;
   document.getElementById('detail-overlay').classList.add('open');
-  document.getElementById('modal-body').innerHTML = `<div class="modal-hadith" style="margin-bottom:14px">${(h.hadith||'').substring(0,200)}…</div><div class="loading"><div class="spin"></div></div>`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-hadith" style="margin-bottom:14px;font-size:.9rem;opacity:.7">${(h.hadith||'').substring(0,150)}…</div>
+    <div class="loading"><div class="spin"></div> جارٍ تحميل الأحاديث المشابهة...</div>`;
   try {
     const d = await api(`/v1/site/hadith/similar/${h.hadithId}`);
     const s = d.data || [];
+    // Store similar results in a temp slot so openDetail can reference them
+    window._similarR = s;
     document.getElementById('modal-body').innerHTML =
-      `<div class="modal-hadith" style="margin-bottom:14px">${h.hadith||''}</div>
-      <div class="sec-title">مشابهة (${s.length})</div>` +
-      s.slice(0,8).map(x => `<div class="similar-item"><div class="similar-text">${x.hadith||''}</div><div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">${badge(x.grade, x.mohdith)}${x.rawi?`<span class="badge b-rawi">${x.rawi}</span>`:''}</div></div>`).join('');
+      `<div class="sec-title">مشابهة (${s.length})</div>` +
+      s.slice(0,8).map((x, idx) => `
+        <div class="similar-item" onclick="openSimilarDetail(${idx})" style="cursor:pointer">
+          <div class="similar-text">${x.hadith||''}</div>
+          <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+            ${badge(x.grade, x.mohdith)}
+            ${x.rawi ? `<span class="badge b-rawi" style="cursor:pointer" onclick="event.stopPropagation();quickSearch('${(x.rawi||'').replace(/'/g,"\\'")}')">${x.rawi}</span>` : ''}
+            ${x.book ? `<span class="badge b-book">${x.book}</span>` : ''}
+            <span style="margin-right:auto;font-size:.7rem;color:var(--emerald);font-weight:600">← تفاصيل</span>
+          </div>
+        </div>`).join('');
   } catch(e){
     document.getElementById('modal-body').innerHTML = '<div style="text-align:center;padding:18px;color:var(--ink-muted)">تعذر التحميل</div>';
   }
+}
+
+async function openSimilarDetail(idx){
+  const h = (window._similarR||[])[idx]; if (!h) return;
+  // Push into _R so openDetail works, then open at that index
+  window._R = window._similarR;
+  const prev = _currentPage; _currentPage = 'search'; // use _R
+  await openDetail(idx);
+  _currentPage = prev;
 }
 
 // ══ CLOSE OVERLAY ══
