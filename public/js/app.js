@@ -477,7 +477,6 @@ async function gotoPage(p){
 async function openDetail(i, scrollToSharh){
   const R = getResultSet();
   const h = R[i]; if (!h) return;
-  console.log('hadith obj:', h);
   document.getElementById('detail-overlay').classList.add('open');
   document.getElementById('modal-body').innerHTML = '<div class="loading"><div class="spin"></div> تحميل التفاصيل...</div>';
   let shH = '', mhH = '', tkH = '';
@@ -486,7 +485,7 @@ async function openDetail(i, scrollToSharh){
   if (!sharhRaw && (h.sharhMetadata?.id || h.hadithId)){
     const fetchId = h.sharhMetadata?.id || h.hadithId;
     try {
-      const d = await api(`/v1/site/hadith/similar/${h.hadithId||h.id}`);
+      const sd = await api(`/v1/site/sharh/${fetchId}`);
       sharhRaw = sd?.data?.sharhMetadata?.sharh || sd?.data?.sharh || sd?.sharhMetadata?.sharh || '';
     } catch(e){}
   }
@@ -523,7 +522,7 @@ async function openDetail(i, scrollToSharh){
     <div style="display:flex;gap:7px;flex-wrap:wrap">
       <button class="btn btn-gold btn-sm" onclick="triggerShareByParts('${hE}','${rE}','${mE}','${gE}')">مشاركة</button>
       <button class="btn btn-sm btn-light" onclick="saveFavObj(${i})">حفظ</button>
-      ${h.hasSimilarHadith?`<button class="btn btn-sm btn-green" onclick="loadSimilar('${h.hadithId||h.id||''}')">مشابهة</button>`:''}
+      ${h.hasSimilarHadith?`<button class="btn btn-sm btn-green" onclick="loadSimilar('${h.hadithId}')">مشابهة</button>`:''}
     </div>`;
   if (scrollToSharh){
     setTimeout(() => {
@@ -547,9 +546,19 @@ async function loadSimilar(id){
     const d = await api(`/v1/site/hadith/similar/${id}`);
     document.getElementById('sl')?.remove();
     const s = d.data || [];
+    window._similarR = s;
     mb.insertAdjacentHTML('beforeend',
       `<div class="sec-title">مشابهة (${s.length})</div>` +
-      s.slice(0,6).map(x => `<div class="similar-item"><div class="similar-text">${x.hadith.substring(0,200)}…</div><div style="margin-top:5px">${badge(x.grade)}</div></div>`).join(''));
+      s.slice(0,8).map((x, idx) => `
+        <div class="similar-item" onclick="openSimilarDetail(${idx})" style="cursor:pointer">
+          <div class="similar-text">${x.hadith||''}</div>
+          <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+            ${badge(x.grade, x.mohdith)}
+            ${x.rawi ? `<span class="badge b-rawi" style="cursor:pointer" onclick="event.stopPropagation();document.getElementById('detail-overlay').classList.remove('open');quickSearch('${(x.rawi||'').replace(/'/g,"\\'")}')">${x.rawi}</span>` : ''}
+            ${x.book ? `<span class="badge b-book">${x.book}</span>` : ''}
+            <span style="margin-right:auto;font-size:.7rem;color:var(--emerald);font-weight:600">← تفاصيل</span>
+          </div>
+        </div>`).join(''));
   } catch(e){ document.getElementById('sl')?.remove(); }
 }
 
