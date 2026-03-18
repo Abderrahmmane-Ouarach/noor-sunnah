@@ -40,102 +40,6 @@ const S = {
 };
 try { S.favs = JSON.parse(localStorage.getItem('noor_favs') || '[]'); } catch(e) {}
 
-// ══ TTS — قراءة الحديث بالصوت ══
-const TTS = {
-  utt: null,
-  activeBtn: null,
-
-  supported: 'speechSynthesis' in window,
-
-  // يوقف أي قراءة جارية ويعيد زر المتكلم إلى حالته الأصلية
-  stop(){
-    if (!this.supported) return;
-    window.speechSynthesis.cancel();
-    if (this.activeBtn) this._resetBtn(this.activeBtn);
-    this.activeBtn = null;
-  },
-
-  // يقرأ النص — إذا كان نفس الزر يُضغط مرة ثانية يوقف
-  speak(text, btn){
-    if (!this.supported){ toast('المتصفح لا يدعم قراءة النص'); return; }
-    if (this.activeBtn === btn){
-      this.stop(); return;
-    }
-    this.stop();
-    this.utt = new SpeechSynthesisUtterance(text);
-    this.utt.lang  = 'ar-SA';
-    this.utt.rate  = 0.82;
-    this.utt.pitch = 1;
-    // اختر أفضل صوت عربي متاح
-    const voices = window.speechSynthesis.getVoices();
-    const arVoice = voices.find(v => v.lang.startsWith('ar')) || null;
-    if (arVoice) this.utt.voice = arVoice;
-
-    this.activeBtn = btn;
-    this._playBtn(btn);
-
-    this.utt.onend = this.utt.onerror = () => {
-      this._resetBtn(btn);
-      if (this.activeBtn === btn) this.activeBtn = null;
-    };
-    window.speechSynthesis.speak(this.utt);
-  },
-
-  _playBtn(btn){
-    if (!btn) return;
-    btn.classList.add('tts-playing');
-    btn.title = 'إيقاف القراءة';
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-      <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
-    </svg>`;
-  },
-
-  _resetBtn(btn){
-    if (!btn) return;
-    btn.classList.remove('tts-playing');
-    btn.title = 'استمع للحديث';
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-    </svg>`;
-  },
-
-  // يُنشئ HTML زر الصوت
-  btn(idx, text){
-    if (!this.supported) return '';
-    const safe = text.replace(/'/g,"\\'").replace(/\n/g,' ').substring(0, 600);
-    return `<button class="ico-btn tts-btn" id="tts-${idx}"
-      onclick="TTS.speak('${safe}', this)" title="استمع للحديث">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-      </svg>
-    </button>`;
-  },
-
-  // زر أكبر للمودال والهيرو
-  bigBtn(text, id='tts-modal'){
-    if (!this.supported) return '';
-    const safe = text.replace(/'/g,"\\'").replace(/\n/g,' ').substring(0, 600);
-    return `<button class="btn btn-sm btn-light" id="${id}"
-      onclick="TTS.speak('${safe}', this)" title="استمع للحديث" style="gap:6px">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-      </svg>
-      استمع
-    </button>`;
-  }
-};
-
-// أعد تحميل الأصوات بعد أن يجهزها المتصفح
-if ('speechSynthesis' in window){
-  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-}
-
 // ══ API BASE ══
 (function(){
   const v = localStorage.getItem('noor_api') || '';
@@ -294,12 +198,14 @@ function renderActiveFilters(){
 function rmFilter(i){ const w = document.getElementById('active-filters'); if (w?._chips?.[i]) w._chips[i].rm(); }
 
 // ══ BADGE ══
-function badge(g){
+// درجة الحديث حكم المحدث — تُعرض دائماً منسوبةً إليه
+function badge(g, mohdith){
   if (!g) return '';
-  if (g.includes('صحيح')) return `<span class="badge b-sahih">${g}</span>`;
-  if (g.includes('حسن'))  return `<span class="badge b-hasan">${g}</span>`;
-  if (g.includes('ضعيف')||g.includes('موضوع')||g.includes('منكر')) return `<span class="badge b-daif">${g}</span>`;
-  return `<span class="badge" style="background:rgba(0,0,0,.06);color:var(--ink-muted);border:1px solid rgba(0,0,0,.1)">${g}</span>`;
+  const label = mohdith ? `${g} — ${mohdith}` : g;
+  if (g.includes('صحيح')) return `<span class="badge b-sahih" title="حكم ${mohdith||'المحدث'} على الحديث">${label}</span>`;
+  if (g.includes('حسن'))  return `<span class="badge b-hasan" title="حكم ${mohdith||'المحدث'} على الحديث">${label}</span>`;
+  if (g.includes('ضعيف')||g.includes('موضوع')||g.includes('منكر')) return `<span class="badge b-daif" title="حكم ${mohdith||'المحدث'} على الحديث">${label}</span>`;
+  return `<span class="badge" style="background:rgba(0,0,0,.06);color:var(--ink-muted);border:1px solid rgba(0,0,0,.1)" title="حكم ${mohdith||'المحدث'} على الحديث">${label}</span>`;
 }
 
 function isFav(h){ return S.favs.some(f => f.hadith === h.hadith && f.rawi === h.rawi); }
@@ -317,9 +223,8 @@ function card(h, i){
   const cats = (h.categories||[]).map(c => `<span class="cat">${c.name}</span>`).join('');
   return `<div class="hcard" id="c${i}">
     <div class="card-top">
-      <div class="card-badges">${badge(h.grade)}${h.book?`<span class="badge b-book">${h.book}</span>`:''}</div>
+      <div class="card-badges">${badge(h.grade, h.mohdith)}${h.book?`<span class="badge b-book">${h.book}</span>`:''}</div>
       <div class="card-btns">
-        ${TTS.btn(i, h.hadith||'')}
         <button class="ico-btn ${fav?'fav':''}" onclick="toggleFav(${i})" title="${fav?'إزالة':'حفظ'}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="${fav?'currentColor':'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </button>
@@ -333,7 +238,6 @@ function card(h, i){
     <div class="card-foot">
       <div class="card-meta">
         ${h.rawi?`<span class="badge b-rawi">${h.rawi}</span>`:''}
-        ${h.mohdith?`<span class="badge b-mohdith">${h.mohdith}</span>`:''}
       </div>
       <div class="card-acts">
         ${h.hasSimilarHadith?`<button class="btn btn-sm btn-green" onclick="openSimilar(${i})">مشابهة</button>`:''}
@@ -440,9 +344,8 @@ function renderDaily(){
   const dm = document.getElementById('daily-meta');
   if (dt) dt.textContent = h.hadith || '';
   if (dm) dm.innerHTML = `
-    ${badge(h.grade)}
+    ${badge(h.grade, h.mohdith)}
     ${h.rawi   ? `<span class="badge b-rawi"  style="color:rgba(255,255,255,.75);background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)">${h.rawi}</span>` : ''}
-    ${h.mohdith? `<span class="badge b-book">${h.mohdith}</span>` : ''}
     ${h.book   ? `<span class="badge b-book">${h.book}</span>` : ''}
   `;
   const shPanel = document.getElementById('daily-sharh');
@@ -455,14 +358,6 @@ function renderDaily(){
   }
   const rb = document.getElementById('refresh-btn');
   if (rb) rb.disabled = false;
-  // زر الاستماع للحديث اليومي
-  const ttsDaily = document.getElementById('tts-daily-btn');
-  if (ttsDaily && h.hadith) {
-    TTS.stop();
-    ttsDaily.style.display = 'inline-flex';
-    ttsDaily.onclick = function(){ TTS.speak(h.hadith, this); };
-    TTS._resetBtn(ttsDaily);
-  }
   const favIcon = document.getElementById('daily-fav-icon');
   if (favIcon){
     if (isFav(h)) { favIcon.style.fill = '#ef4444'; favIcon.style.stroke = '#ef4444'; }
@@ -589,21 +484,7 @@ async function openDetail(i, scrollToSharh){
   if (sharhRaw){
     const commentary = extractSharh(sharhRaw);
     const display = (commentary && commentary.length > 15) ? commentary : sharhRaw.trim();
-    if (display.length > 5){
-      const sharhSafe = display.replace(/'/g,"\\'").replace(/\n/g,' ').substring(0,1000);
-      const ttsSharhBtn = TTS.supported
-        ? `<button class="btn btn-sm btn-light" id="tts-sharh"
-            onclick="TTS.speak('${sharhSafe}', this)" title="استمع للشرح" style="gap:5px">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-            </svg>استمع للشرح</button>`
-        : '';
-      shH = `<div class="sec-title" id="sharh-section" style="display:flex;align-items:center;justify-content:space-between">
-        <span style="display:flex;align-items:center;gap:7px">شرح الحديث</span>
-        ${ttsSharhBtn}
-      </div><div class="info-box sharh-full">${display}</div>`;
-    }
+    if (display.length > 5) shH = `<div class="sec-title" id="sharh-section">شرح الحديث</div><div class="info-box sharh-full">${display}</div>`;
   }
   if (h.mohdithId){
     try {
@@ -622,7 +503,7 @@ async function openDetail(i, scrollToSharh){
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-hadith">${h.hadith||''}</div>
     <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px">
-      ${badge(h.grade)}
+      ${badge(h.grade, h.mohdith)}
       ${h.rawi         ? `<span class="badge b-rawi">${h.rawi}</span>` : ''}
       ${h.book         ? `<span class="badge b-book">${h.book}</span>` : ''}
       ${h.numberOrPage ? `<span class="badge" style="background:var(--bg2);color:var(--ink-muted);border:1px solid var(--border)">رقم: ${h.numberOrPage}</span>` : ''}
@@ -631,7 +512,6 @@ async function openDetail(i, scrollToSharh){
     ${shH}${tkH}${mhH}
     <div class="sec-title" style="margin-top:14px">إجراءات</div>
     <div style="display:flex;gap:7px;flex-wrap:wrap">
-      ${TTS.bigBtn(h.hadith||'', 'tts-modal')}
       <button class="btn btn-gold btn-sm" onclick="triggerShareByParts('${hE}','${rE}','${mE}','${gE}')">مشاركة</button>
       <button class="btn btn-sm btn-light" onclick="saveFavObj(${i})">حفظ</button>
       ${h.hasSimilarHadith?`<button class="btn btn-sm btn-green" onclick="loadSimilar('${h.hadithId}')">مشابهة</button>`:''}
@@ -675,7 +555,7 @@ async function openSimilar(i){
     document.getElementById('modal-body').innerHTML =
       `<div class="modal-hadith" style="margin-bottom:14px">${h.hadith||''}</div>
       <div class="sec-title">مشابهة (${s.length})</div>` +
-      s.slice(0,8).map(x => `<div class="similar-item"><div class="similar-text">${x.hadith||''}</div><div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">${badge(x.grade)}${x.rawi?`<span class="badge b-rawi">${x.rawi}</span>`:''}</div></div>`).join('');
+      s.slice(0,8).map(x => `<div class="similar-item"><div class="similar-text">${x.hadith||''}</div><div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">${badge(x.grade, x.mohdith)}${x.rawi?`<span class="badge b-rawi">${x.rawi}</span>`:''}</div></div>`).join('');
   } catch(e){
     document.getElementById('modal-body').innerHTML = '<div style="text-align:center;padding:18px;color:var(--ink-muted)">تعذر التحميل</div>';
   }
