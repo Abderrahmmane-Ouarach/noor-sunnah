@@ -363,7 +363,15 @@ function renderDaily(){
     if (isFav(h)) { favIcon.style.fill = '#ef4444'; favIcon.style.stroke = '#ef4444'; }
     else          { favIcon.style.fill = 'none';    favIcon.style.stroke = 'currentColor'; }
   }
+  
+  const simBtn = document.getElementById('daily-sim-btn');
+  if (simBtn) {
+    simBtn.style.display = h.hasSimilarHadith ? 'inline-flex' : 'none';
+    simBtn.onclick = () => openDailySimilar();  
+  }
 }
+
+
 
 function toggleDailySharh(){
   const h = S.daily; if (!h) return;
@@ -544,9 +552,8 @@ async function loadSimilar(id){
   } catch(e){ document.getElementById('sl')?.remove(); }
 }
 
-async function openSimilar(i){
-  const R = getResultSet();
-  const h = R[i]; if (!h || !h.hadithId) return;
+async function openDailySimilar(){
+  const h = S.daily; if (!h || !h.hadithId) return;
   document.getElementById('detail-overlay').classList.add('open');
   document.getElementById('modal-body').innerHTML = `
     <div class="modal-hadith" style="margin-bottom:14px;font-size:.9rem;opacity:.7">${(h.hadith||'').substring(0,150)}…</div>
@@ -554,7 +561,6 @@ async function openSimilar(i){
   try {
     const d = await api(`/v1/site/hadith/similar/${h.hadithId}`);
     const s = d.data || [];
-    // Store similar results in a temp slot so openDetail can reference them
     window._similarR = s;
     document.getElementById('modal-body').innerHTML =
       `<div class="sec-title">مشابهة (${s.length})</div>` +
@@ -563,7 +569,7 @@ async function openSimilar(i){
           <div class="similar-text">${x.hadith||''}</div>
           <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;align-items:center">
             ${badge(x.grade, x.mohdith)}
-            ${x.rawi ? `<span class="badge b-rawi" style="cursor:pointer" onclick="event.stopPropagation();quickSearch('${(x.rawi||'').replace(/'/g,"\\'")}')">${x.rawi}</span>` : ''}
+            ${x.rawi ? `<span class="badge b-rawi" style="cursor:pointer" onclick="event.stopPropagation();document.getElementById('detail-overlay').classList.remove('open');quickSearch('${(x.rawi||'').replace(/'/g,"\\'")}')">${x.rawi}</span>` : ''}
             ${x.book ? `<span class="badge b-book">${x.book}</span>` : ''}
             <span style="margin-right:auto;font-size:.7rem;color:var(--emerald);font-weight:600">← تفاصيل</span>
           </div>
