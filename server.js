@@ -1,6 +1,6 @@
 /**
  * نور السنة — Railway Server
- * Serves public/index.html AND proxies /v1/* to 98.92.59.173
+ * Serves public/index.html AND proxies /v1/* to EC2
  * Railway auto-injects PORT env variable.
  */
 
