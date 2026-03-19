@@ -684,12 +684,13 @@ function triggerShare(h){
 function openShare(i){ const R = getResultSet(); const h = R[i]; if (h) triggerShare(h); }
 function triggerShareByParts(hadith, rawi, mohdith, grade){ triggerShare({hadith, rawi, mohdith, grade}); }
 function fmt(h){
-  let t = `📿 ${h.hadith||''}`;
-  if (h.rawi)    t += `\n\n👤 الراوي: ${h.rawi}`;
-  if (h.mohdith) t += `\n🎓 المحدث: ${h.mohdith}`;
-  if (h.book)    t += `\n📚 الكتاب: ${h.book}`;
-  if (h.grade)   t += `\n✅ الدرجة: ${h.grade}`;
-  t += `\n\n🌟 نور السنة — موسوعة الأحاديث النبوية`;
+  let t = `روي عن رسول الله ﷺ:\n\n`;
+  t += `« ${h.hadith||''} »\n`;
+  t += `\n─────────────────`;
+  if (h.rawi)    t += `\n📖 رواه ${h.rawi}`;
+  if (h.mohdith) t += `\n✦ أخرجه ${h.mohdith}${h.book ? ` في ${h.book}` : ''}`;
+  if (h.grade)   t += `\n✦ الدرجة: ${h.grade}`;
+  t += `\n\n🌐 نور السنة\nnoor-al-sunnah-production.up.railway.app`;
   return t;
 }
 function via(p){
