@@ -240,7 +240,6 @@ function card(h, i){
         ${h.rawi?`<span class="badge b-rawi">${h.rawi}</span>`:''}
       </div>
       <div class="card-acts">
-        ${h.hasSimilarHadith?`<button class="btn btn-sm btn-green" onclick="openSimilar(${i})">مشابهة</button>`:''}
         ${h.hasSharhMetadata?`<button class="btn btn-sm btn-light" onclick="openDetail(${i},true)">الشرح</button>`:''}
       </div>
     </div>
