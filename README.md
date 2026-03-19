@@ -91,7 +91,7 @@ Base URL en local : `http://localhost:3000`
 ### API sur AWS EC2
 ```bash
 ssh -i key.pem ubuntu@<EC2-IP>
-git clone https://github.com/AhmedElTabarani/dorar-hadith-api.git
+git clone https://github.com/Abderrahmmane-Ouarach/dorar-hadith-api.git
 cd dorar-hadith-api
 npm install
 # Configurer le cache dans config/config.js : CACHE_EACH = 43200
