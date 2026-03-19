@@ -684,8 +684,7 @@ function triggerShare(h){
 function openShare(i){ const R = getResultSet(); const h = R[i]; if (h) triggerShare(h); }
 function triggerShareByParts(hadith, rawi, mohdith, grade){ triggerShare({hadith, rawi, mohdith, grade}); }
 function fmt(h){
-  let t = `روي عن رسول الله ﷺ:\n\n`;
-  t += `« ${h.hadith||''} »\n`;
+  let t = `« ${h.hadith||''} »\n`;
   t += `\n─────────────────`;
   if (h.rawi)    t += `\n📖 رواه ${h.rawi}`;
   if (h.mohdith) t += `\n✦ أخرجه ${h.mohdith}${h.book ? ` في ${h.book}` : ''}`;
