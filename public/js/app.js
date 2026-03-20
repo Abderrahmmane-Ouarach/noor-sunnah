@@ -784,6 +784,10 @@ function dismissBanner() {
 window.addEventListener('appinstalled', () => {
   banner.style.display = 'none';
 });
+// Cache le bandeau si déjà installé
+window.addEventListener('appinstalled', () => {
+  banner.style.display = 'none';
+});
 // ══ INIT ══
 checkApi();
 setInterval(checkApi, 30000);
