@@ -738,6 +738,12 @@ function removeTashkeel(str) {
     .trim();
 }
 
+// ===== PWA Service Worker =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js')
+    .then(() => console.log('SW registered'))
+    .catch(err => console.error('SW error:', err));
+}
 // ══ INIT ══
 checkApi();
 setInterval(checkApi, 30000);
