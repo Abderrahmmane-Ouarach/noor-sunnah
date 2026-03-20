@@ -56,7 +56,23 @@
 </head>
 
 <body>
-
+<!-- PWA Install Banner -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:70px;left:12px;right:12px;
+  background:#1a2e1f;border:1px solid #2e7d4f;border-radius:14px;padding:14px 16px;
+  z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.4);display:none;
+  align-items:center;gap:12px;font-family:'Cairo',sans-serif;">
+  <img src="/icons/android-chrome-192x192.png" width="40" height="40"
+    style="border-radius:10px;flex-shrink:0">
+  <div style="flex:1">
+    <div style="color:#c8e6c9;font-weight:700;font-size:.85rem">نور السنة</div>
+    <div style="color:#7aab8a;font-size:.75rem">ثبّت التطبيق على هاتفك</div>
+  </div>
+  <button onclick="installPWA()" style="background:#2e7d4f;color:#fff;border:none;
+    border-radius:8px;padding:7px 14px;font-family:'Cairo',sans-serif;
+    font-size:.8rem;font-weight:600;cursor:pointer">تثبيت</button>
+  <button onclick="dismissBanner()" style="background:transparent;border:none;
+    color:#7aab8a;font-size:1.2rem;cursor:pointer;padding:0 4px">✕</button>
+</div>
 <!-- HEADER -->
 <header>
   <div class="header-inner">
