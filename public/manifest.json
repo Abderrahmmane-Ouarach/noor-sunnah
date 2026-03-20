@@ -1,4 +1,6 @@
 {
+  "name": "نور السنة",
+  "short_name": "نور السنة",
   "description": "موسوعة الأحاديث النبوية",
   "start_url": "/",
   "display": "standalone",
