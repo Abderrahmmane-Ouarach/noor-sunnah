@@ -738,56 +738,34 @@ function removeTashkeel(str) {
     .trim();
 }
 
-// ===== PWA Service Worker =====
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
-    .then(() => console.log('SW registered'))
-    .catch(err => console.error('SW error:', err));
-}
-
-
-// ===== PWA Install Banner =====
+// ===== PWA Install =====
 let deferredPrompt;
-const banner = document.getElementById('pwa-banner');
+const installBtn = document.getElementById('pwa-install-btn');
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-
-  // N'affiche pas si l'utilisateur a déjà refusé
-  if (!localStorage.getItem('pwa-dismissed')) {
-    setTimeout(() => {
-      banner.style.display = 'flex';
-    }, 3000); // affiche après 3 secondes
-  }
+  installBtn.style.display = 'flex'; // affiche le bouton
 });
 
 function installPWA() {
-  banner.style.display = 'none';
   if (deferredPrompt) {
+    // Android Chrome
     deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((result) => {
-      if (result.outcome === 'accepted') {
-        console.log('PWA installée');
-      }
+    deferredPrompt.userChoice.then(() => {
       deferredPrompt = null;
+      installBtn.style.display = 'none';
     });
+  } else {
+    // iOS Safari
+    showToast('افتح قائمة المشاركة ثم اختر "إضافة إلى الشاشة الرئيسية"');
   }
 }
 
-function dismissBanner() {
-  banner.style.display = 'none';
-  localStorage.setItem('pwa-dismissed', '1');
-}
+window.addEventListener('appinstalled', () => {
+  installBtn.style.display = 'none';
+});
 
-// Cache le bandeau si déjà installé
-window.addEventListener('appinstalled', () => {
-  banner.style.display = 'none';
-});
-// Cache le bandeau si déjà installé
-window.addEventListener('appinstalled', () => {
-  banner.style.display = 'none';
-});
 // ══ INIT ══
 checkApi();
 setInterval(checkApi, 30000);
