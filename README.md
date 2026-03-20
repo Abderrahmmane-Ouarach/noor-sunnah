@@ -3,7 +3,7 @@
 > **موسوعة الأحاديث النبوية الشريفة**  
 > Application web de recherche et consultation des Hadiths Prophétiques.
 
-🌐 **Live** : [noor-al-sunnah-production.up.railway.app](https://noor-al-sunnah-production.up.railway.app)
+🌐 **Live** : [noor-sunnah.up.railway.app](https://noor-sunnah.up.railway.app/)
 
 ---
 
