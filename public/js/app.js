@@ -689,7 +689,7 @@ function fmt(h){
   if (h.rawi)    t += `\n📖 رواه ${h.rawi}`;
   if (h.mohdith) t += `\n✦ أخرجه ${h.mohdith}${h.book ? ` في ${h.book}` : ''}`;
   if (h.grade)   t += `\n✦ الدرجة: ${h.grade}`;
-  t += `\n\n🌐 نور السنة\nnoor-al-sunnah-production.up.railway.app`;
+  t += `\n\n🌐 نور السنة\nhttps://noor-sunnah.up.railway.app/`;
   return t;
 }
 function via(p){
