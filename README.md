@@ -5,6 +5,8 @@
 
 🌐 **Live** : [noor-sunnah.up.railway.app](https://noor-sunnah.up.railway.app/)
 
+📲 **Android** : [Télécharger l'APK](https://github.com/Abderrahmmane-Ouarach/noor-al-sunnah/releases/download/v1.0.0/noor-sunnah.apk)
+
 ---
 
 ## 📌 Description
