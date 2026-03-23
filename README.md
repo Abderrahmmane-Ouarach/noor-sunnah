@@ -1,4 +1,4 @@
-# نور السنة — Noor Al Sunnah
+# نور السنة — Noor Sunnah
 
 > **موسوعة الأحاديث النبوية الشريفة**  
 > Application web de recherche et consultation des Hadiths Prophétiques.
