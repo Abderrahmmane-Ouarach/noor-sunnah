@@ -1,9 +1,16 @@
 # نور السنة — Noor Sunnah
 
-> **موسوعة الأحاديث النبوية الشريفة**  
+> **موسوعة الأحاديث النبوية الشريفة**<img width="192" height="192" alt="android-chrome-192x192" src="https://github.com/user-attachments/assets/e45984a0-2cbb-4662-a3c0-a4afc1e1344b" />
+  
+
 > Application web de recherche et consultation des Hadiths Prophétiques.
 
-🌐 **Live** : [noor-sunnah.up.railway.app](https://noor-sunnah.up.railway.app/)
+[Screencast from 2026-03-14 10-03-30.webm](https://github.com/user-attachments/assets/98a4e006-941a-4713-b3cc-1d8d70f9f697)
+
+
+
+
+🌐 **Live** : [noor-sunnah.up.railway.app](https://noor-sunnah.up.railway.app/) (La durée de l'abonnement gratuit à Railway a été terminée)
 
 📲 **Android** : [Télécharger l'APK](https://github.com/Abderrahmmane-Ouarach/noor-al-sunnah/releases/download/v1.0.0/noor-sunnah.apk)
 
